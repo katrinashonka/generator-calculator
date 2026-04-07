@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор Калькулятор</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Калькулятор Генератора</h1>
+
+    <label>
+        Потужність генератора (Вт):
+        <input type="number" id="generatorPower" placeholder="Наприклад: 3000">
+    </label>
+
+    <h2>Оберіть прилади:</h2>
+
+    <div id="applianceList"></div>
+
+    <div class="results">
+        <h3>Загальне навантаження: <span id="totalLoad">0</span> Вт</h3>
+        <h3 id="status"></h3>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
