@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор Генератора</title>
+<link href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Figtree', sans-serif;
+  background-color: #0057B7;
+  color: #e8ecf2;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Folk art PNG borders */
+body::before, body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  width: 380px;
+  height: 100vh;
+  background-image: url("folk-left.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  opacity: 0.35;
+  z-index: 0;
+  pointer-events: none;
+}
+body::before { left: -60px; }
+body::after { right: -60px; transform: scaleX(-1); }
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 40px auto;
+  padding: 0;
+  background: rgba(30, 70, 140, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 20, 60, 0.4);
+  overflow: hidden;
+}
+
+.header {
+  padding: 34px 36px 28px;
+  text-align: center;
+}
+
+h1 {
+  font-family: 'Philosopher', serif;
+  font-size: 36px;
+  color: #FFD700;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.subtitle {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.body-content {
+  padding: 8px 36px 36px;
+}
+
+/* Generator input section */
+.gen-input-section {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 26px;
+  flex-wrap: wrap;
+}
+.gen-input-section > div { flex: 1; min-width: 180px; }
+.gen-input-section label {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.gen-input-section input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  font-size: 16px;
+  font-family: 'Figtree', sans-serif;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transition: border-color 0.2s, background 0.2s;
+}
+.gen-input-section input::placeholder { color: rgba(255, 255, 255, 0.3); }
+.gen-input-section input:focus {
+  outline: none;
+  border-color: rgba(255, 215, 0, 0.5);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Category sections */
+.section-title {
+  font-family: 'Philosopher', serif;
+  font-size: 18px;
+  color: #FFD700;
+  margin: 20px 0 0;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s;
+}
+.section-title:hover { color: #ffe566; }
+.section-title .arrow {
+  display: inline-block;
+  transition: transform 0.25s;
+  font-size: 12px;
+  opacity: 0.6;
+}
+.section-title .arrow.open { transform: rotate(90deg); }
+
+.category-items {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.category-items.collapsed { max-height: 0 !important; }
+
+/* Appliance rows */
+.appliance-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  margin: 3px 0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  transition: background 0.15s;
+  gap: 12px;
+}
+.appliance-row:hover { background: rgba(255, 255, 255, 0.08); }
+.appliance-row.checked { background: rgba(255, 215, 0, 0.1); }
+
+.appliance-row input[type=checkbox] {
+  width: 18px;
+  height: 18px;
+  accent-color: #FFD700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.appliance-row .info { flex: 1; min-width: 0; }
+.appliance-row .app-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+.appliance-row .app-watts {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 400;
+}
+.appliance-row .qty-control {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  font-family: 'Figtree', sans-serif;
+}
+.qty-btn:hover { background: rgba(255, 215, 0, 0.2); color: #FFD700; border-color: rgba(255, 215, 0, 0.4); }
+.qty-val {
+  width: 24px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Results */
+.results-panel {
+  margin-top: 28px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.15);
+  transition: border-color 0.3s;
+}
+.results-panel.safe { border-color: rgba(72, 199, 110, 0.5); }
+.results-panel.danger { border-color: rgba(230, 70, 60, 0.6); }
+
+.results-header {
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.load-display {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+}
+.load-display strong {
+  font-size: 28px;
+  color: #FFD700;
+  font-family: 'Figtree', sans-serif;
+}
+.results-panel.danger .load-display strong { color: #ff6b6b; }
+
+.status-badge {
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+}
+.status-badge.safe { background: rgba(72, 199, 110, 0.2); color: #6fdb8f; }
+.status-badge.danger { background: rgba(230, 70, 60, 0.25); color: #ff6b6b; animation: pulse 1.2s infinite; }
+.status-badge.neutral { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.4); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Progress bar */
+.load-bar-bg {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  margin: 0 20px 16px;
+  overflow: hidden;
+}
+.load-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s, background 0.4s;
+  background: #48c76e;
+}
+.load-bar-fill.warn { background: #f0c040; }
+.load-bar-fill.danger { background: #e6463c; }
+
+/* Warning banner */
+.warning-banner {
+  margin: 0 20px 16px;
+  padding: 11px 14px;
+  background: rgba(255, 200, 50, 0.1);
+  border-left: 3px solid rgba(255, 200, 50, 0.5);
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  color: rgba(255, 230, 150, 0.9);
+  display: none;
+}
+.warning-banner.show { display: block; }
+
+.results-details {
+  padding: 14px 20px 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.detail-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+.detail-card .label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+.detail-card .value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #FFD700;
+}
+.detail-card .value.red { color: #ff6b6b; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 16px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 600px) {
+  .container { margin: 16px; border-radius: 18px; }
+  .header { padding: 26px 20px 20px; }
+  .body-content { padding: 8px 20px 28px; }
+  h1 { font-size: 28px; }
+  .results-details { grid-template-columns: 1fr; }
+  .gen-input-section > div { min-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>Калькулятор Генератора</h1>
+    <div class="subtitle">Перевірте навантаження та час роботи вашого генератора</div>
+  </div>
+
+  <div class="body-content">
+    <div class="gen-input-section">
+      <div>
+        <label for="genPower">Потужність генератора (Вт)</label>
+        <input type="number" id="genPower" placeholder="Наприклад: 3000" oninput="calculate()">
+      </div>
+      <div>
+        <label for="tankSize">Бак пального (літри)</label>
+        <input type="number" id="tankSize" placeholder="Наприклад: 15" oninput="calculate()">
+      </div>
+    </div>
+
+    <div id="categories"></div>
+
+    <div class="results-panel" id="resultsPanel">
+      <div class="results-header">
+        <div class="load-display">
+          Навантаження: <strong id="totalLoad">0</strong> Вт
+        </div>
+        <div class="status-badge neutral" id="statusBadge">Оберіть прилади</div>
+      </div>
+      <div class="load-bar-bg">
+        <div class="load-bar-fill" id="loadBar" style="width:0%"></div>
+      </div>
+      <div class="warning-banner" id="warningBanner"></div>
+      <div class="results-details">
+        <div class="detail-card">
+          <div class="label">Використано</div>
+          <div class="value" id="percentUsed">—</div>
+        </div>
+        <div class="detail-card">
+          <div class="label">Залишок потужності</div>
+          <div class="value" id="remaining">—</div>
+        </div>
+        <div class="detail-card">
+          <div class="label">Орієнтовний час роботи</div>
+          <div class="value" id="runtime">—</div>
+        </div>
+        <div class="detail-card">
+          <div class="label">Витрата пального</div>
+          <div class="value" id="fuelRate">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Зроблено з любов'ю</div>
+
+<script>
+const categories = [
+  {
+    name: "Кухня",
+    items: [
+      { name: "Холодильник", watts: 150 },
+      { name: "Електрочайник", watts: 2000 },
+      { name: "Мікрохвильовка", watts: 1200 },
+      { name: "Мультиварка", watts: 860 },
+      { name: "Тостер", watts: 800 },
+      { name: "Кавоварка", watts: 1000 },
+    ]
+  },
+  {
+    name: "Освітлення",
+    items: [
+      { name: "LED лампа", watts: 15 },
+      { name: "Настільна лампа", watts: 40 },
+      { name: "LED стрічка (5м)", watts: 30 },
+    ]
+  },
+  {
+    name: "Опалення та вода",
+    items: [
+      { name: "Обігрівач (масляний)", watts: 1500 },
+      { name: "Тепловентилятор", watts: 2000 },
+      { name: "Водяний насос", watts: 800 },
+      { name: "Бойлер (50л)", watts: 1500 },
+    ]
+  },
+  {
+    name: "Техніка та зв'язок",
+    items: [
+      { name: "WiFi роутер", watts: 20 },
+      { name: "Зарядка телефону", watts: 10 },
+      { name: "Ноутбук", watts: 65 },
+      { name: "Телевізор", watts: 100 },
+      { name: "Зарядка планшету", watts: 15 },
+    ]
+  },
+  {
+    name: "Інше",
+    items: [
+      { name: "Пральна машина", watts: 500 },
+      { name: "Праска", watts: 2200 },
+      { name: "Пилосос", watts: 1400 },
+      { name: "Фен", watts: 1800 },
+    ]
+  }
+];
+
+const state = {};
+
+function buildUI() {
+  const container = document.getElementById('categories');
+  categories.forEach((cat, ci) => {
+    const title = document.createElement('div');
+    title.className = 'section-title';
+    title.innerHTML = `${cat.name} <span class="arrow open" id="arrow-${ci}">&#9656;</span>`;
+    title.onclick = () => toggleCategory(ci);
+    container.appendChild(title);
+
+    const itemsDiv = document.createElement('div');
+    itemsDiv.className = 'category-items';
+    itemsDiv.id = `cat-${ci}`;
+
+    cat.items.forEach((item, ii) => {
+      const key = `${ci}-${ii}`;
+      state[key] = { checked: false, qty: 1, watts: item.watts };
+
+      const row = document.createElement('div');
+      row.className = 'appliance-row';
+      row.id = `row-${key}`;
+      row.innerHTML = `
+        <input type="checkbox" id="cb-${key}" onchange="toggle('${key}', this.checked)">
+        <div class="info">
+          <div class="app-name">${item.name}</div>
+          <div class="app-watts">${item.watts} Вт</div>
+        </div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty('${key}', -1)">&minus;</button>
+          <span class="qty-val" id="qty-${key}">1</span>
+          <button class="qty-btn" onclick="changeQty('${key}', 1)">&plus;</button>
+        </div>
+      `;
+      itemsDiv.appendChild(row);
+    });
+    container.appendChild(itemsDiv);
+  });
+}
+
+function toggleCategory(ci) {
+  const el = document.getElementById(`cat-${ci}`);
+  const arrow = document.getElementById(`arrow-${ci}`);
+  el.classList.toggle('collapsed');
+  arrow.classList.toggle('open');
+}
+
+function toggle(key, checked) {
+  state[key].checked = checked;
+  document.getElementById(`row-${key}`).classList.toggle('checked', checked);
+  calculate();
+}
+
+function changeQty(key, delta) {
+  const s = state[key];
+  s.qty = Math.max(1, Math.min(10, s.qty + delta));
+  document.getElementById(`qty-${key}`).textContent = s.qty;
+  if (s.checked) calculate();
+}
+
+function calculate() {
+  const genPower = parseInt(document.getElementById('genPower').value) || 0;
+  const tankSize = parseFloat(document.getElementById('tankSize').value) || 0;
+
+  let total = 0;
+  for (const key in state) {
+    const s = state[key];
+    if (s.checked) total += s.watts * s.qty;
+  }
+
+  document.getElementById('totalLoad').textContent = total;
+
+  const panel = document.getElementById('resultsPanel');
+  const badge = document.getElementById('statusBadge');
+  const bar = document.getElementById('loadBar');
+  const warning = document.getElementById('warningBanner');
+
+  if (genPower === 0) {
+    badge.textContent = 'Введіть потужність';
+    badge.className = 'status-badge neutral';
+    panel.className = 'results-panel';
+    bar.style.width = '0%';
+    bar.className = 'load-bar-fill';
+    document.getElementById('percentUsed').textContent = '—';
+    document.getElementById('remaining').textContent = '—';
+    warning.className = 'warning-banner';
+  } else {
+    const pct = (total / genPower) * 100;
+    const remain = genPower - total;
+
+    document.getElementById('percentUsed').textContent = Math.round(Math.min(pct, 999)) + '%';
+    document.getElementById('percentUsed').className = pct > 100 ? 'value red' : 'value';
+    document.getElementById('remaining').textContent = remain >= 0 ? remain + ' Вт' : 'Перевищено';
+    document.getElementById('remaining').className = remain < 0 ? 'value red' : 'value';
+
+    bar.style.width = Math.min(pct, 100) + '%';
+    if (pct > 100) {
+      bar.className = 'load-bar-fill danger';
+      badge.textContent = 'Перевантаження';
+      badge.className = 'status-badge danger';
+      panel.className = 'results-panel danger';
+    } else if (pct > 80) {
+      bar.className = 'load-bar-fill warn';
+      badge.textContent = 'Високе навантаження';
+      badge.className = 'status-badge safe';
+      panel.className = 'results-panel safe';
+    } else {
+      bar.className = 'load-bar-fill';
+      badge.textContent = 'Безпечно';
+      badge.className = 'status-badge safe';
+      panel.className = 'results-panel safe';
+    }
+
+    if (pct > 80 && pct <= 100) {
+      warning.textContent = 'Увага: навантаження понад 80%. Не вмикайте додаткові прилади.';
+      warning.className = 'warning-banner show';
+    } else if (pct > 100) {
+      warning.textContent = 'Небезпека! Загальна потужність перевищує можливості генератора. Вимкніть деякі прилади!';
+      warning.className = 'warning-banner show';
+    } else {
+      warning.className = 'warning-banner';
+    }
+  }
+
+  const runtimeEl = document.getElementById('runtime');
+  const fuelEl = document.getElementById('fuelRate');
+
+  if (total > 0 && tankSize > 0) {
+    const litersPerHour = (total / 1000) * 0.4;
+    const hours = tankSize / litersPerHour;
+    fuelEl.textContent = litersPerHour.toFixed(1) + ' л/год';
+    if (hours >= 1) {
+      const h = Math.floor(hours);
+      const m = Math.round((hours - h) * 60);
+      runtimeEl.textContent = h + ' год' + (m > 0 ? ' ' + m + ' хв' : '');
+    } else {
+      runtimeEl.textContent = Math.round(hours * 60) + ' хв';
+    }
+  } else if (total > 0) {
+    const litersPerHour = (total / 1000) * 0.4;
+    fuelEl.textContent = litersPerHour.toFixed(1) + ' л/год';
+    runtimeEl.textContent = 'Вкажіть бак';
+  } else {
+    runtimeEl.textContent = '—';
+    fuelEl.textContent = '—';
+  }
+}
+
+buildUI();
+</script>
+</body>
+</html>

@@ -1,31 +1,68 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Генератор Калькулятор</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Калькулятор Генератора</title>
+  <link href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
+  <div class="header">
     <h1>Калькулятор Генератора</h1>
+    <div class="subtitle">Перевірте навантаження та час роботи вашого генератора</div>
+  </div>
 
-    <label>
-        Потужність генератора (Вт):
-        <input type="number" id="generatorPower" placeholder="Наприклад: 3000">
-    </label>
-
-    <h2>Оберіть прилади:</h2>
-
-    <div id="applianceList"></div>
-
-    <div class="results">
-        <h3>Загальне навантаження: <span id="totalLoad">0</span> Вт</h3>
-        <h3 id="status"></h3>
+  <div class="body-content">
+    <div class="gen-input-section">
+      <div>
+        <label for="genPower">Потужність генератора (Вт)</label>
+        <input type="number" id="genPower" placeholder="Наприклад: 3000" oninput="calculate()">
+      </div>
+      <div>
+        <label for="tankSize">Бак пального (літри)</label>
+        <input type="number" id="tankSize" placeholder="Наприклад: 15" oninput="calculate()">
+      </div>
     </div>
+
+    <div id="categories"></div>
+
+    <div class="results-panel" id="resultsPanel">
+      <div class="results-header">
+        <div class="load-display">
+          Навантаження: <strong id="totalLoad">0</strong> Вт
+        </div>
+        <div class="status-badge neutral" id="statusBadge">Оберіть прилади</div>
+      </div>
+      <div class="load-bar-bg">
+        <div class="load-bar-fill" id="loadBar" style="width:0%"></div>
+      </div>
+      <div class="warning-banner" id="warningBanner"></div>
+      <div class="results-details">
+        <div class="detail-card">
+          <div class="label">Використано</div>
+          <div class="value" id="percentUsed">—</div>
+        </div>
+        <div class="detail-card">
+          <div class="label">Залишок потужності</div>
+          <div class="value" id="remaining">—</div>
+        </div>
+        <div class="detail-card">
+          <div class="label">Орієнтовний час роботи</div>
+          <div class="value" id="runtime">—</div>
+        </div>
+        <div class="detail-card">
+          <div class="label">Витрата пального</div>
+          <div class="value" id="fuelRate">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<div class="footer">Зроблено з любов'ю</div>
 
 <script src="script.js"></script>
 </body>
