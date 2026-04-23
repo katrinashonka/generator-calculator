@@ -8,6 +8,7 @@ const categories = [
       { name: "Мультиварка", watts: 860 },
       { name: "Тостер", watts: 800 },
       { name: "Кавоварка", watts: 1000 },
+      { name: "Посудомийна машина", watts: 1800 },
     ]
   },
   {
@@ -33,6 +34,7 @@ const categories = [
       { name: "WiFi роутер", watts: 20 },
       { name: "Зарядка телефону", watts: 10 },
       { name: "Ноутбук", watts: 65 },
+      { name: "Зарядка комп'ютера", watts: 300 },
       { name: "Телевізор", watts: 100 },
       { name: "Зарядка планшету", watts: 15 },
     ]

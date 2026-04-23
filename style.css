@@ -1,4 +1,4 @@
-{ box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   font-family: 'Figtree', sans-serif;
@@ -68,11 +68,11 @@ h1 {
 /* Generator input section */
 .gen-input-section {
   display: flex;
-  gap: 14px;
+  gap: 20px;
   margin-bottom: 26px;
   flex-wrap: wrap;
 }
-.gen-input-section > div { flex: 1; min-width: 180px; }
+.gen-input-section > div { flex: 1; min-width: 240px; }
 
 .gen-input-section label {
   display: block;
